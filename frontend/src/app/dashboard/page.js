@@ -112,10 +112,10 @@ export default function Dashboard() {
                     <form onSubmit={handleGenerate}>
                         <div className="flex flex-col gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Generation Prompt</label>
+                                <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Your Content</label>
                                 <textarea
                                     className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all min-h-[120px]"
-                                    placeholder="Describe your infographic... e.g., 'The impact of AI on productivity in 2024 with 3 key stats'"
+                                    placeholder="Enter the data or story you want to visualize in Nano Banana Pro style..."
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
                                 />
