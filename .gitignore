@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+build
+.firebase
+*.log
+.env.local
+.DS_Store
+dist

@@ -1,0 +1,42 @@
+{
+    "rules": {
+        "users": {
+            "$uid": {
+                ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+                ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"
+            }
+        },
+        "subscriptions": {
+            "$uid": {
+                ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+                ".write": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"
+            }
+        },
+        "infographics": {
+            "$uid": {
+                ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+                "$infographicId": {
+                    ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"
+                }
+            }
+        },
+        "usage": {
+            "$uid": {
+                ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+                ".write": "false"
+            }
+        },
+        "analytics": {
+            "global": {
+                ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+                ".write": "false"
+            }
+        },
+        "clickTracking": {
+            "$infographicId": {
+                ".read": "true",
+                ".write": "true"
+            }
+        }
+    }
+}
