@@ -35,8 +35,15 @@ export default function Dashboard() {
         setMessage({ type: 'info', text: 'AI is thinking... Generating your infographic.' });
 
         try {
-            const generateFn = httpsCallable(functions, 'generateInfographic');
-            const result = await generateFn({ prompt, templateId: template });
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, templateId: template, uid: user.uid })
+            });
+
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error);
 
             setPrompt('');
             setMessage({ type: 'success', text: 'Infographic generated successfully!' });
@@ -129,8 +136,8 @@ export default function Dashboard() {
                                 <button
                                     disabled={isGenerating || !prompt}
                                     className={`flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all ${isGenerating || !prompt
-                                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                                         }`}
                                 >
                                     {isGenerating ? 'Generating...' : 'Generate New Infographic'}
@@ -142,8 +149,8 @@ export default function Dashboard() {
 
                     {message && (
                         <div className={`mt-6 p-4 rounded-xl text-sm font-medium border ${message.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
-                                    'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+                            message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
                             }`}>
                             {message.text}
                         </div>
