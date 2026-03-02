@@ -9,8 +9,9 @@ import Link from 'next/link';
 
 export default function Dashboard() {
     const { user, userData } = useAuth();
-    const [prompt, setPrompt] = useState('');
-    const [template, setTemplate] = useState('modern');
+    const [subject, setSubject] = useState('');
+    const [lessonTitle, setLessonTitle] = useState('');
+    const [teacherName, setTeacherName] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [infographics, setInfographics] = useState([]);
     const [message, setMessage] = useState(null);
@@ -29,24 +30,30 @@ export default function Dashboard() {
 
     const handleGenerate = async (e) => {
         e.preventDefault();
-        if (!prompt) return;
+        if (!subject || !lessonTitle) return;
 
         setIsGenerating(true);
-        setMessage({ type: 'info', text: 'AI is thinking... Generating your infographic.' });
+        setMessage({ type: 'info', text: 'AI is thinking... Generating your royal infographic.' });
 
         try {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, templateId: template, uid: user.uid })
+                body: JSON.stringify({
+                    subject,
+                    lessonTitle,
+                    teacherName: teacherName || userData?.name || 'الأستاذ منير محمد',
+                    uid: user.uid
+                })
             });
 
             const data = await response.json();
 
             if (data.error) throw new Error(data.error);
 
-            setPrompt('');
-            setMessage({ type: 'success', text: 'Infographic generated successfully!' });
+            setSubject('');
+            setLessonTitle('');
+            setMessage({ type: 'success', text: 'Royal Infographic generated successfully!' });
         } catch (err) {
             console.error(err);
             setMessage({ type: 'error', text: err.message || 'Failed to generate infographic.' });
@@ -97,60 +104,62 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <main className="flex-grow p-10 overflow-y-auto">
-                <header className="flex justify-between items-center mb-12">
-                    <div>
-                        <h1 className="text-3xl font-black tracking-tight">Dashboard</h1>
-                        <p className="text-slate-400">Transform your data into beautiful visuals.</p>
+                <header className="flex justify-between items-center mb-12 text-right rtl">
+                    <div className="w-full">
+                        <h1 className="text-3xl font-black tracking-tight mb-2">لوحة التحكم الملكية</h1>
+                        <p className="text-slate-400">حول دروسك إلى تصاميم احترافية بضغطة زر</p>
                     </div>
-                    <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20">
-                        <Plus className="w-5 h-5" /> New Visual
-                    </button>
                 </header>
 
                 {/* Generator Form */}
                 <section className="bg-slate-900/50 border border-white/5 rounded-3xl p-8 mb-12">
-                    <form onSubmit={handleGenerate}>
-                        <div className="flex flex-col gap-6">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Your Content</label>
-                                <textarea
-                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all min-h-[120px]"
-                                    placeholder="Enter the data or story you want to visualize in Nano Banana Pro style..."
-                                    value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                />
-                            </div>
-                            <div className="flex items-end justify-between gap-4">
-                                <div className="flex-grow max-w-xs">
-                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Template</label>
-                                    <select
-                                        className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-white focus:outline-none"
-                                        value={template}
-                                        onChange={(e) => setTemplate(e.target.value)}
-                                    >
-                                        <option value="modern">Modern Minimalist</option>
-                                        <option value="colorful">Vibrant Data</option>
-                                        <option value="corporate">Corporate Report</option>
-                                    </select>
-                                </div>
-                                <button
-                                    disabled={isGenerating || !prompt}
-                                    className={`flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all ${isGenerating || !prompt
+                    <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="flex flex-col">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 text-right">المادة العلمية</label>
+                            <input
+                                className="bg-slate-950 border border-white/10 rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all text-right"
+                                placeholder="مثال: تاريخ، علوم..."
+                                value={subject}
+                                onChange={(e) => setSubject(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 text-right">عنوان الدرس</label>
+                            <input
+                                className="bg-slate-950 border border-white/10 rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all text-right"
+                                placeholder="مثال: موقع مصر الجغرافي"
+                                value={lessonTitle}
+                                onChange={(e) => setLessonTitle(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 text-right">اسم المعلم</label>
+                            <input
+                                className="bg-slate-950 border border-white/10 rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all text-right"
+                                placeholder="اتركه فارغاً للافتراضي"
+                                value={teacherName}
+                                onChange={(e) => setTeacherName(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="md:col-span-3 flex justify-end items-center gap-4 mt-4">
+                            <button
+                                disabled={isGenerating || !subject || !lessonTitle}
+                                className={`flex items-center gap-3 px-10 py-4 rounded-xl font-black transition-all ${isGenerating || !subject || !lessonTitle
                                         ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                                         : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                        }`}
-                                >
-                                    {isGenerating ? 'Generating...' : 'Generate New Infographic'}
-                                    {!isGenerating && <Send className="w-5 h-5" />}
-                                </button>
-                            </div>
+                                    }`}
+                            >
+                                {isGenerating ? 'جاري التصميم الملكي...' : 'إنشاء الانفوجرافيك'}
+                                {!isGenerating && <Send className="w-5 h-5 rtl:rotate-180" />}
+                            </button>
                         </div>
                     </form>
 
                     {message && (
                         <div className={`mt-6 p-4 rounded-xl text-sm font-medium border ${message.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                            message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
-                                'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+                                message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                    'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
                             }`}>
                             {message.text}
                         </div>
@@ -159,38 +168,41 @@ export default function Dashboard() {
 
                 {/* Infographics Grid */}
                 <section>
-                    <h2 className="text-xl font-bold mb-6">Recent Creations</h2>
+                    <h2 className="text-xl font-bold mb-6 text-right">إبداعاتك الأخيرة</h2>
                     {infographics.length === 0 ? (
                         <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
                             <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
                                 <Layout className="w-8 h-8 text-slate-600" />
                             </div>
-                            <p className="text-slate-500">No infographics yet. Start by typing a prompt above!</p>
+                            <p className="text-slate-500 font-medium">ابدأ بملء البيانات أعلاه لترى إبداعك!</p>
                         </div>
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {infographics.map((item) => (
                                 <div key={item.id} className="group bg-slate-900/50 border border-white/5 rounded-2xl overflow-hidden hover:border-indigo-500/30 transition-all">
                                     <div className="aspect-[3/4] bg-slate-800 relative">
-                                        <img src={item.outputUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all" alt={item.prompt} />
+                                        <img src={item.outputUrl} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all shadow-inner" alt={item.lessonTitle} />
                                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
                                         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                                            <span className="bg-indigo-600/80 backdrop-blur-sm text-[10px] font-black uppercase tracking-tighter px-2 py-1 rounded">
-                                                {item.templateId}
+                                            <span className="bg-indigo-600/90 backdrop-blur-sm text-[10px] font-black uppercase tracking-tighter px-3 py-1.5 rounded-lg border border-white/10">
+                                                {item.subject || 'NANO PRO'}
                                             </span>
                                             <div className="flex gap-2">
-                                                <button className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-white/20 transition-all">
+                                                <button className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/20 transition-all">
                                                     <Eye className="w-4 h-4" />
                                                 </button>
-                                                <button className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-white/20 transition-all">
+                                                <button className="w-9 h-9 bg-indigo-600/20 text-indigo-400 backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-indigo-600/40 transition-all">
                                                     <Download className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="p-4">
-                                        <p className="text-sm font-medium line-clamp-1 text-slate-300">{item.prompt}</p>
-                                        <p className="text-[10px] text-slate-500 mt-1">{new Date(item.createdAt).toLocaleDateString()}</p>
+                                    <div className="p-5 text-right">
+                                        <p className="text-sm font-black text-white mb-1">{item.lessonTitle || 'بدون عنوان'}</p>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <span className="text-[10px] text-slate-500">{new Date(item.createdAt).toLocaleDateString('ar-EG')}</span>
+                                            <span className="text-[11px] font-bold text-slate-400">{item.teacherName}</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
