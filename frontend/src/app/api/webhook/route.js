@@ -2,11 +2,21 @@ import { NextResponse } from 'next/server';
 const admin = require('firebase-admin');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Initialize Firebase Admin (Singleton pattern)
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)),
-        databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL
-    });
+    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    if (serviceAccountKey) {
+        try {
+            admin.initializeApp({
+                credential: admin.credential.cert(JSON.parse(serviceAccountKey)),
+                databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL
+            });
+        } catch (e) {
+            console.error('Firebase Admin initialization failed:', e.message);
+        }
+    } else {
+        console.warn('FIREBASE_SERVICE_ACCOUNT_KEY is missing. Firebase Admin will not be initialized.');
+    }
 }
 
 export async function POST(req) {
